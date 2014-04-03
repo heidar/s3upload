@@ -19,10 +19,10 @@ var (
 )
 
 func init() {
-	flag.StringVar(&region, "r", "USWest2", "Region")
-	flag.StringVar(&bucketName, "b", "", "Bucket Name")
-	flag.StringVar(&directory, "d", ".", "Directory")
-	flag.StringVar(&permission, "p", "BucketOwnerFull", "Permission")
+	flag.StringVar(&region,     "r", "USWest2",         "region")
+	flag.StringVar(&bucketName, "b", "",                "bucket name")
+	flag.StringVar(&directory,  "d", ".",               "directory")
+	flag.StringVar(&permission, "p", "BucketOwnerFull", "permission")
 }
 
 func upload(directory string, f os.FileInfo, bucket *s3.Bucket, permission s3.ACL, done chan bool) {
