@@ -1,6 +1,6 @@
 # s3upload.go
 
-s3upload.go is a simple command line tool to upload images to Amazon S3 in
+s3upload.go is a simple command line tool to upload files to Amazon S3 in
 parallel. I created this tool as a part of a concurrency course at university.
 Someone at Heroku suggsted to my professor that this would be a good project
 so I thought I might as well do it, since I wanted to learn how to use S3 too.
@@ -54,4 +54,3 @@ then run it with the variables prepended:
 ## TODO
 
  - Change from uploading everything at once to a fixed amount of workers
- - Set the correct MIME type (not just JPG)

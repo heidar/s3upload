@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"regexp"
 
 	"launchpad.net/goamz/aws"
 	"launchpad.net/goamz/s3"
@@ -32,7 +31,7 @@ func upload(directory string, f os.FileInfo, bucket *s3.Bucket, permission s3.AC
 	if err != nil {
 		panic(err.Error())
 	}
-	err = bucket.Put(f.Name(), data, "image/jpeg", permission)
+	err = bucket.Put(f.Name(), data, "", permission)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -98,19 +97,11 @@ func main() {
 	s := s3.New(auth, awsRegions[region])
 	bucket := s.Bucket(bucketName)
 
-	// prepare the list of image files to upload
-	r, err := regexp.Compile(`.jpg$|.jpeg$|.png$|.tiff$|.raw$|.gif$|.bmp$|.webp$|`)
-	if err != nil {
-		panic(err.Error())
-	}
-
 	done := make(chan bool)
 	files, _ := ioutil.ReadDir(directory)
 	for _, f := range files {
-		if r.MatchString(f.Name()) {
-			// send off goroutines doing uploads
-			go upload(directory, f, bucket, permissions[permission], done)
-		}
+		// send off goroutines doing uploads
+		go upload(directory, f, bucket, permissions[permission], done)
 	}
 
 	// wait for all goroutines to finish
