@@ -38,6 +38,19 @@ Ubuntu. I decided to make my life easier and use that instead.
     BucketOwnerRead
     BucketOwnerFull
 
+### Authentication
+
+Authentication is done through environment variables. Make sure the following
+environment variables are set:
+
+    AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY
+
+If your environment variables do not work (like mine) with Go for some reason
+then run it with the variables prepended:
+
+    AWS_SECRET_ACCESS_KEY=xyz AWS_SECRET_ACCESS_KEY=abc go run s3upload.go ...
+
 ## TODO
 
  - Change from uploading everything at once to a fixed amount of workers
