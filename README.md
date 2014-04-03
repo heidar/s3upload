@@ -5,6 +5,10 @@ parallel. I created this tool as a part of a concurrency course at university.
 Someone at Heroku suggsted to my professor that this would be a good project
 so I thought I might as well do it, since I wanted to learn how to use S3 too.
 
+I kind of wanted to do it all from scratch and just do a HTTP PUT with HMAC
+authentication but I found this really nice Go library for AWS and S3 from
+Ubuntu. I decided to make my life easier and use that instead.
+
 ## Usage
 
 ### Command Line Options
@@ -33,12 +37,6 @@ so I thought I might as well do it, since I wanted to learn how to use S3 too.
     AuthenticatedRead
     BucketOwnerRead
     BucketOwnerFull
-
-## Other
-
-I kind of wanted to do it all from scratch and just do a HTTP PUT with HMAC
-authentication but I found this really nice Go library for AWS and S3 from
-Ubuntu. I decided to make my life easier and use that instead.
 
 ## TODO
 
