@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"path"
+	"strconv"
+	"sync"
 
 	"launchpad.net/goamz/aws"
 	"launchpad.net/goamz/s3"
@@ -16,6 +18,7 @@ var (
 	bucketName string
 	directory  string
 	permission string
+	workers    string
 )
 
 func init() {
@@ -23,9 +26,10 @@ func init() {
 	flag.StringVar(&bucketName, "b", "",                "bucket name")
 	flag.StringVar(&directory,  "d", ".",               "directory")
 	flag.StringVar(&permission, "p", "BucketOwnerFull", "permission")
+	flag.StringVar(&workers,    "w", "1",               "workers")
 }
 
-func upload(directory string, f os.FileInfo, bucket *s3.Bucket, permission s3.ACL, done chan bool) {
+func upload(directory string, f os.FileInfo, bucket *s3.Bucket, permission s3.ACL) {
 	log.Println("uploading " + f.Name())
 	data, err := ioutil.ReadFile(path.Join(directory, f.Name()))
 	if err != nil {
@@ -36,7 +40,6 @@ func upload(directory string, f os.FileInfo, bucket *s3.Bucket, permission s3.AC
 		panic(err.Error())
 	}
 	log.Println("finished uploading " + f.Name())
-	done <- true
 }
 
 func main() {
@@ -87,6 +90,12 @@ func main() {
 		return
 	}
 
+	// check workers are set and is int
+	workers, err := strconv.Atoi(workers)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env vars are used
 	auth, err := aws.EnvAuth()
 	if err != nil {
@@ -97,16 +106,27 @@ func main() {
 	s := s3.New(auth, awsRegions[region])
 	bucket := s.Bucket(bucketName)
 
-	done := make(chan bool)
-	files, _ := ioutil.ReadDir(directory)
-	for _, f := range files {
-		// send off goroutines doing uploads
-		go upload(directory, f, bucket, permissions[permission], done)
+	// spawn goroutines
+	fileChannel := make(chan os.FileInfo, 64)
+	var wg sync.WaitGroup
+	log.Println("spawning " + strconv.Itoa(workers) + " workers")
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func() {
+			for file := range fileChannel {
+				upload(directory, file, bucket, permissions[permission])
+			}
+			wg.Done()
+		}()
 	}
 
-	// wait for all goroutines to finish
-	for _ = range files {
-		<-done
+	// hand work to the goroutines
+	files, _ := ioutil.ReadDir(directory)
+	for _, f := range files {
+		fileChannel <- f
 	}
+	close(fileChannel)
+
+	wg.Wait()
 	log.Println("done")
 }
