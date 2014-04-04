@@ -26,7 +26,7 @@ func init() {
 	flag.StringVar(&bucketName, "b", "",                "bucket name")
 	flag.StringVar(&directory,  "d", ".",               "directory")
 	flag.StringVar(&permission, "p", "BucketOwnerFull", "permission")
-	flag.StringVar(&workers,    "w", "1",               "workers")
+	flag.StringVar(&workers,    "w", "4",               "workers")
 }
 
 func upload(directory string, f os.FileInfo, bucket *s3.Bucket, permission s3.ACL) {
