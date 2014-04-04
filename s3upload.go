@@ -123,7 +123,9 @@ func main() {
 	// hand work to the goroutines
 	files, _ := ioutil.ReadDir(directory)
 	for _, f := range files {
-		fileChannel <- f
+		if !f.IsDir() {
+			fileChannel <- f
+		}
 	}
 	close(fileChannel)
 
