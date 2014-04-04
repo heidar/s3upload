@@ -107,7 +107,8 @@ func main() {
 	bucket := s.Bucket(bucketName)
 
 	// spawn goroutines
-	fileChannel := make(chan os.FileInfo, 64)
+	files, _ := ioutil.ReadDir(directory)
+	fileChannel := make(chan os.FileInfo, len(files))
 	var wg sync.WaitGroup
 	log.Println("spawning " + strconv.Itoa(workers) + " workers")
 	for i := 0; i < workers; i++ {
@@ -121,7 +122,6 @@ func main() {
 	}
 
 	// hand work to the goroutines
-	files, _ := ioutil.ReadDir(directory)
 	for _, f := range files {
 		if !f.IsDir() {
 			fileChannel <- f
