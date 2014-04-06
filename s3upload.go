@@ -127,8 +127,8 @@ func main() {
 			fileChannel <- f
 		}
 	}
-	close(fileChannel)
 
 	wg.Wait()
+	close(fileChannel)
 	log.Println("done")
 }
